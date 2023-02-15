@@ -2,7 +2,9 @@
 Main cli or app entry point
 """
 
-from mylib.calculator import add
+from app import app
+from app.calculator import add
+
 import click
 
 
@@ -15,4 +17,5 @@ def add_cli(a, b):
 
 if __name__ == "__main__":
     # pylint: disable=no-value-for-parameter
-    add_cli()
+    db.create_all()
+    app.run(debug=True)
