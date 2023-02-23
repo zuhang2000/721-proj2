@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-
-<html>  
-    <head>
-        <title>To Do List</title>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    </head>
-    <body>
-        <div class="container">
-            <h1>To Do List</h1>
-            <ul>
-                {% for task in tasks %}
-                    <li>{{ task }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <form action="/" method="POST">
-            <input type="text" name="content" id="content">
-            <input type="submit" value="Add To Do Task">
-        </form>
-    </body>
+<html>
+<head>
+	<title>Todo List</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+	<h1>Todo List</h1>
+	<form action="{{ url_for('add') }}" method="post">
+		<label for="task">New task:</label>
+		<input type="text" id="task" name="task" required>
+		<button type="submit">Add</button>
+	</form>
+	<ul>
+	{% for task in tasks %}
+		<li{% if task.completed %} class="completed"{% endif %}>
+			<span>{{ task.task }}</span>
+			<div class="actions">
+				<a href="{{ url_for('update', id=task.id) }}">Mark as {{ 'not ' if task.completed else '' }}completed</a>
+				<a href="{{ url_for('delete', id=task.id) }}">Delete</a>
+			</div>
+		</li>
+	{% endfor %}
+	</ul>
+</body>
 </html>
-    

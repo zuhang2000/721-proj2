@@ -2,38 +2,41 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-
-from app import routes
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
 db = SQLAlchemy(app)
 
-class Todolist(db.Model):
+class TodoList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
-    complete = db.Column(db.Boolean)
+    task = db.Column(db.String(200), nullable=False)
+    completed = db.Column(db.Boolean, default=False)
 
-    def __repr__(self):
-        return "<Title %r>" % self.id
-
-@app.route("/")
+@app.route('/')
 def index():
-    todo_list = Todolist.query.all()
-    return render_template("index.html", todo_list=todo_list)
+    tasks = TodoList.query.all()
+    return render_template('index.html', tasks=tasks)
 
-
-@app.route("/add", methods=["POST"])
+@app.route('/add', methods=['POST'])
 def add():
-    title = request.form.get("title")
-    new_todo = Todolist(title=title, complete=False)
-    db.session.add(new_todo)
+    task = request.form['task']
+    new_task = TodoList(task=task)
+    db.session.add(new_task)
     db.session.commit()
-    return redirect(url_for("index"))
+    return redirect(url_for('index'))
 
-@app.route("/update/<int:todo_id>")
-def update(todo_id):
-    todo = Todolist.query.filter_by(id=todo_id).first()
-    todo.complete = not todo.complete
+@app.route('/update/<int:id>')
+def update(id):
+    task = TodoList.query.filter_by(id=id).first()
+    task.completed = not task.completed
     db.session.commit()
-    return redirect(url_for("index"))
+    return redirect(url_for('index'))
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    task = TodoList.query.filter_by(id=id).first()
+    db.session.delete(task)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    db.create_all()
+    app.run(debug=True)
